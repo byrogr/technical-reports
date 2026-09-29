@@ -16,12 +16,15 @@ import com.scontrol.technicalreports.config.JwtProperties;
 import com.scontrol.technicalreports.dto.LoginRequest;
 import com.scontrol.technicalreports.dto.LoginResponse;
 
+import lombok.RequiredArgsConstructor;
+
 /**
  * Servicio de autenticación: valida credenciales y emite el JWT de acceso.
  *
  * @author Roger Rojas Effio - roger.rojas@rmsolutions.pe
  */
 @Service
+@RequiredArgsConstructor
 public class AuthService {
 
     private static final String ISSUER = "technical-reports";
@@ -29,13 +32,6 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final JwtEncoder jwtEncoder;
     private final JwtProperties jwtProperties;
-
-    public AuthService(AuthenticationManager authenticationManager, JwtEncoder jwtEncoder,
-                       JwtProperties jwtProperties) {
-        this.authenticationManager = authenticationManager;
-        this.jwtEncoder = jwtEncoder;
-        this.jwtProperties = jwtProperties;
-    }
 
     public LoginResponse login(LoginRequest request) {
         // Lanza AuthenticationException si las credenciales no son válidas

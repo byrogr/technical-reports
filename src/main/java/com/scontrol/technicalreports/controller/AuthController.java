@@ -10,6 +10,7 @@ import com.scontrol.technicalreports.dto.LoginResponse;
 import com.scontrol.technicalreports.service.AuthService;
 
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 
 /**
  * Endpoints de autenticación.
@@ -18,13 +19,10 @@ import jakarta.validation.Valid;
  */
 @RestController
 @RequestMapping("/api/auth")
+@RequiredArgsConstructor
 public class AuthController {
 
     private final AuthService authService;
-
-    public AuthController(AuthService authService) {
-        this.authService = authService;
-    }
 
     @PostMapping("/login")
     public LoginResponse login(@Valid @RequestBody LoginRequest request) {

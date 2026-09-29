@@ -9,6 +9,10 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 /**
  * Equipo (sistema completo, ej. transmisor + receptor) perteneciente a un cliente.
@@ -17,10 +21,14 @@ import jakarta.persistence.Table;
  */
 @Entity
 @Table(name = "equipment")
+@Getter
+@Setter
+@NoArgsConstructor
 public class Equipment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Setter(AccessLevel.NONE)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -33,40 +41,4 @@ public class Equipment {
     // Texto libre: puede contener varios N/S, ej. "777 - 19 00160 / 777 - 19 00161"
     @Column(name = "serial_number")
     private String serialNumber;
-
-    protected Equipment() {
-    }
-
-    public Equipment(Client client, String model) {
-        this.client = client;
-        this.model = model;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public Client getClient() {
-        return client;
-    }
-
-    public void setClient(Client client) {
-        this.client = client;
-    }
-
-    public String getModel() {
-        return model;
-    }
-
-    public void setModel(String model) {
-        this.model = model;
-    }
-
-    public String getSerialNumber() {
-        return serialNumber;
-    }
-
-    public void setSerialNumber(String serialNumber) {
-        this.serialNumber = serialNumber;
-    }
 }

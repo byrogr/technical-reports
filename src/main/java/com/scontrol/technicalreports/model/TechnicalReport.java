@@ -13,6 +13,10 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 /**
  * Informe técnico de mantenimiento realizado sobre un equipo.
@@ -21,10 +25,14 @@ import jakarta.persistence.Table;
  */
 @Entity
 @Table(name = "technical_reports")
+@Getter
+@Setter
+@NoArgsConstructor
 public class TechnicalReport {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Setter(AccessLevel.NONE)
     private Long id;
 
     @Column(name = "report_number", nullable = false, unique = true, length = 20)
@@ -72,122 +80,11 @@ public class TechnicalReport {
     private Catalog supervisor;
 
     @CreationTimestamp
+    @Setter(AccessLevel.NONE)
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "created_by", nullable = false, updatable = false)
     private User createdBy;
-
-    protected TechnicalReport() {
-    }
-
-    public TechnicalReport(String reportNumber, User createdBy) {
-        this.reportNumber = reportNumber;
-        this.createdBy = createdBy;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getReportNumber() {
-        return reportNumber;
-    }
-
-    public Equipment getEquipment() {
-        return equipment;
-    }
-
-    public void setEquipment(Equipment equipment) {
-        this.equipment = equipment;
-    }
-
-    public LocalDateTime getStartDatetime() {
-        return startDatetime;
-    }
-
-    public void setStartDatetime(LocalDateTime startDatetime) {
-        this.startDatetime = startDatetime;
-    }
-
-    public LocalDateTime getEndDatetime() {
-        return endDatetime;
-    }
-
-    public void setEndDatetime(LocalDateTime endDatetime) {
-        this.endDatetime = endDatetime;
-    }
-
-    public Catalog getInitialStatus() {
-        return initialStatus;
-    }
-
-    public void setInitialStatus(Catalog initialStatus) {
-        this.initialStatus = initialStatus;
-    }
-
-    public Catalog getFinalStatus() {
-        return finalStatus;
-    }
-
-    public void setFinalStatus(Catalog finalStatus) {
-        this.finalStatus = finalStatus;
-    }
-
-    public Catalog getEventFailure() {
-        return eventFailure;
-    }
-
-    public void setEventFailure(Catalog eventFailure) {
-        this.eventFailure = eventFailure;
-    }
-
-    public String getAffectedComponent() {
-        return affectedComponent;
-    }
-
-    public void setAffectedComponent(String affectedComponent) {
-        this.affectedComponent = affectedComponent;
-    }
-
-    public Catalog getAction() {
-        return action;
-    }
-
-    public void setAction(Catalog action) {
-        this.action = action;
-    }
-
-    public String getDetails() {
-        return details;
-    }
-
-    public void setDetails(String details) {
-        this.details = details;
-    }
-
-    public Catalog getPersonnel() {
-        return personnel;
-    }
-
-    public void setPersonnel(Catalog personnel) {
-        this.personnel = personnel;
-    }
-
-    public Catalog getSupervisor() {
-        return supervisor;
-    }
-
-    public void setSupervisor(Catalog supervisor) {
-        this.supervisor = supervisor;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public User getCreatedBy() {
-        return createdBy;
-    }
 }

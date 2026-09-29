@@ -8,6 +8,10 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 /**
  * Opción configurable de un catálogo (acción, estado, evento/falla, personal o responsable).
@@ -16,10 +20,14 @@ import jakarta.persistence.Table;
  */
 @Entity
 @Table(name = "catalogs")
+@Getter
+@Setter
+@NoArgsConstructor
 public class Catalog {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Setter(AccessLevel.NONE)
     private Long id;
 
     @Enumerated(EnumType.STRING)
@@ -31,40 +39,4 @@ public class Catalog {
 
     @Column(nullable = false)
     private boolean active = true;
-
-    protected Catalog() {
-    }
-
-    public Catalog(CatalogType type, String value) {
-        this.type = type;
-        this.value = value;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public CatalogType getType() {
-        return type;
-    }
-
-    public void setType(CatalogType type) {
-        this.type = type;
-    }
-
-    public String getValue() {
-        return value;
-    }
-
-    public void setValue(String value) {
-        this.value = value;
-    }
-
-    public boolean isActive() {
-        return active;
-    }
-
-    public void setActive(boolean active) {
-        this.active = active;
-    }
 }

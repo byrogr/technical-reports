@@ -11,19 +11,18 @@ import org.springframework.transaction.annotation.Transactional;
 import com.scontrol.technicalreports.model.User;
 import com.scontrol.technicalreports.repository.UserRepository;
 
+import lombok.RequiredArgsConstructor;
+
 /**
  * Carga los usuarios por email para que Spring Security valide sus credenciales.
  *
  * @author Roger Rojas Effio - roger.rojas@rmsolutions.pe
  */
 @Service
+@RequiredArgsConstructor
 public class AppUserDetailsService implements UserDetailsService {
 
     private final UserRepository userRepository;
-
-    public AppUserDetailsService(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
 
     @Override
     @Transactional(readOnly = true)
