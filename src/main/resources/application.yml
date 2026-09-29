@@ -4,9 +4,9 @@ spring:
 
   # Base de datos (valores por defecto para el PostgreSQL local de compose.yaml)
   datasource:
-    url: ${DB_URL:jdbc:postgresql://localhost:5432/technical_reports}
-    username: ${DB_USERNAME:technical_reports}
-    password: ${DB_PASSWORD:technical_reports}
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/technical_reports_db}
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:secret}
 
   # El esquema lo gestiona Flyway; Hibernate solo valida que las entidades coincidan
   jpa:
