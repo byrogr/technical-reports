@@ -1,0 +1,37 @@
+# Instalación local completa (API + PostgreSQL) para el PC de un operario.
+# Ver docs/LOCAL_INSTALL.md. Uso: docker compose -f compose.local.yaml up -d --build
+services:
+  db:
+    image: postgres:17
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: technical_reports
+      POSTGRES_USER: ${DB_USERNAME:?definir DB_USERNAME en .env}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?definir DB_PASSWORD en .env}
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d technical_reports"]
+      interval: 5s
+      retries: 10
+
+  app:
+    build: .
+    image: scontrol/technical-reports:local
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_URL: jdbc:postgresql://db:5432/technical_reports
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET:?definir JWT_SECRET en .env (mínimo 32 caracteres)}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
+    # Solo accesible desde el propio PC
+    ports:
+      - "127.0.0.1:8080:8080"
+
+volumes:
+  db-data:
