@@ -40,6 +40,7 @@ microservicios ni monolito modular — no se justifica a esta escala.
 | Base de datos | PostgreSQL |
 | Generación de documentos | Apache POI (Word) y/o OpenPDF (PDF) — iText descartado por licencia AGPL |
 | Build | Maven |
+| Boilerplate / mapeo | Lombok y MapStruct |
 | Migraciones de BD | Flyway (recomendado desde el inicio, evita dolores de cabeza después) |
 | Tests | JUnit 5 + Testcontainers (PostgreSQL real, sin H2) |
 
@@ -53,7 +54,7 @@ com.scontrol.technicalreports
 ├── repository/       # Spring Data JPA repositories
 ├── model/ (entity)   # Entidades JPA
 ├── dto/              # Request/Response DTOs
-├── mapper/            # Entity <-> DTO (manual o MapStruct)
+├── mapper/            # Entity <-> DTO con MapStruct
 ├── exception/         # Manejo centralizado de errores
 └── document/          # Generación de PDF/Word (Apache POI / OpenPDF)
 ```
@@ -245,7 +246,12 @@ incontable en inglés).*
 |---|---|---|
 | GET | `/api/catalogs?type=ACTION` | Listar por tipo |
 | POST | `/api/catalogs` | Crear opción nueva |
-| PUT | `/api/catalogs/{id}` | Editar / desactivar |
+| PUT | `/api/catalogs/{id}` | Editar valor / desactivar (el tipo no se puede cambiar) |
+
+*El listado devuelve opciones activas e inactivas (cada una con su campo `active`); el
+cliente de la API decide cuáles mostrar. No hay DELETE: una opción se desactiva para no
+romper los informes que ya la usan. Las opciones iniciales de la Hoja2 del Excel se cargan
+en la migración `V2__seed_catalogs.sql`.*
 
 ### Technical Reports
 | Método | Ruta | Descripción |
@@ -257,6 +263,14 @@ incontable en inglés).*
 | GET | `/api/technical-reports/{id}/document` | Descarga el PDF/Word generado |
 
 ## 7. Lógica de negocio clave
+
+**Borrado con dependencias:** no se permite eliminar un cliente que tenga equipos ni un
+equipo que tenga informes; la API responde `409 Conflict`. No hay borrado en cascada ni
+borrado lógico para clientes y equipos.
+
+**Errores de la API:** en formato ProblemDetail (RFC 9457). `400` validación, `401` sin
+token o credenciales inválidas, `404` recurso inexistente, `409` duplicados (documento de
+cliente, opción de catálogo) o dependencias.
 
 **Numeración correlativa:** al crear un informe se genera el siguiente número en
 formato `<serie>-<correlativo>`, ej. `008-0001`.

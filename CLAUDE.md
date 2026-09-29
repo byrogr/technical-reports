@@ -17,6 +17,7 @@ en esta misma raíz — léelo también antes de implementar cualquier fase.
 - PostgreSQL
 - Flyway (migraciones)
 - Maven
+- Lombok (reducir boilerplate) y MapStruct (mapeo Entity <-> DTO)
 - Apache POI (Word) / OpenPDF (PDF) para generación de documentos — **no usar iText** (licencia AGPL)
 - Testcontainers (PostgreSQL) para tests de integración — no usar H2
 
@@ -41,6 +42,18 @@ public class TechnicalReportService {
 
 *Nota:* el `@author` usa el formato `Nombre - correo`, sin `<...>`: Javadoc interpretaría
 los signos como HTML y el doclint fallaría.
+
+**Lombok y MapStruct:**
+- Entidades JPA: `@Getter`, `@Setter` y `@NoArgsConstructor`, con `@Setter(AccessLevel.NONE)`
+  en el `id` y en campos gestionados por la BD. **No usar `@Data`, `@ToString` ni
+  `@EqualsAndHashCode` en entidades** (disparan cargas lazy y rompen el `equals` de Hibernate).
+- Servicios, controllers y componentes: inyección por constructor con `@RequiredArgsConstructor`;
+  logs con `@Slf4j`.
+- DTOs y `@ConfigurationProperties`: `record` de Java, sin Lombok.
+- Mapeos: interfaces MapStruct en `mapper/` con `@Mapper(uses = StringMapper.class)` (recorta
+  espacios en los String). El `pom.xml` configura `componentModel=spring`, inyección por
+  constructor y `unmappedTargetPolicy=ERROR`: todo campo destino no mapeado debe marcarse con
+  `@Mapping(target = "...", ignore = true)` o la compilación falla.
 
 **Arquitectura:** monolito simple en capas (controller → service → repository).
 No usar microservicios ni monolito modular — no se justifica para este proyecto

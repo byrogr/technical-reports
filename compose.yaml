@@ -3,9 +3,9 @@ services:
   postgres:
     image: postgres:17
     environment:
-      POSTGRES_DB: technical_reports
-      POSTGRES_USER: technical_reports
-      POSTGRES_PASSWORD: technical_reports
+      POSTGRES_DB: technical_reports_db
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: secret
     ports:
       - "5432:5432"
     volumes:

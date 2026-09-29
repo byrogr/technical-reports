@@ -9,6 +9,7 @@ documento final en PDF/Word. Reemplaza el llenado manual en Excel.
 - Java 21, Spring Boot 4, Maven
 - Spring Security + JWT (OAuth2 Resource Server)
 - Spring Data JPA, PostgreSQL, Flyway
+- Lombok y MapStruct
 - Tests de integración con Testcontainers
 
 ## Requisitos
