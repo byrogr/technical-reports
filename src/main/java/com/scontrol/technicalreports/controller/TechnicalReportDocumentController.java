@@ -11,6 +11,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.scontrol.technicalreports.document.ReportDocument;
 import com.scontrol.technicalreports.service.TechnicalReportDocumentService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -19,12 +22,14 @@ import lombok.RequiredArgsConstructor;
  * @author Roger Rojas Effio - roger.rojas@rmsolutions.pe
  */
 @RestController
+@Tag(name = "Technical Reports", description = "Informes técnicos de mantenimiento")
 @RequiredArgsConstructor
 public class TechnicalReportDocumentController {
 
     private final TechnicalReportDocumentService documentService;
 
-    @GetMapping("/api/technical-reports/{id}/document")
+    @Operation(summary = "Descargar el informe en PDF")
+    @GetMapping(value = "/api/technical-reports/{id}/document", produces = MediaType.APPLICATION_PDF_VALUE)
     public ResponseEntity<byte[]> download(@PathVariable Long id) {
         ReportDocument document = documentService.generatePdf(id);
         return ResponseEntity.ok()

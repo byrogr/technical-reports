@@ -2,6 +2,7 @@ package com.scontrol.technicalreports.dto;
 
 import java.time.LocalDateTime;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -25,6 +26,8 @@ public record TechnicalReportRequest(
         @NotNull Long personnelId,
         @NotNull Long supervisorId) {
 
+    // Solo validación: no es un campo del JSON
+    @Schema(hidden = true)
     @AssertTrue(message = "endDatetime no puede ser anterior a startDatetime")
     public boolean isDateRangeValid() {
         return startDatetime == null || endDatetime == null || !endDatetime.isBefore(startDatetime);

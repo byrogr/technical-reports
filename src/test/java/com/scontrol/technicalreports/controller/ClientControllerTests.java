@@ -1,5 +1,6 @@
 package com.scontrol.technicalreports.controller;
 
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.startsWith;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
@@ -84,7 +85,9 @@ class ClientControllerTests {
         createClient("""
                 {"name": " ", "contactEmail": "no-es-email"}
                 """)
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.detail").value("La petición tiene campos inválidos"))
+                .andExpect(jsonPath("$.errors[*].field", contains("contactEmail", "name")));
     }
 
     @Test

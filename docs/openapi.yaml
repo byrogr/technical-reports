@@ -1,0 +1,693 @@
+openapi: 3.1.0
+info:
+  contact:
+    email: roger.rojas@rmsolutions.pe
+    name: Roger Rojas Effio
+  description: "API REST para registrar informes técnicos de mantenimiento de equipos\
+    \ y generar el documento PDF. Todos los endpoints, salvo el login, requieren un\
+    \ JWT en la cabecera Authorization: Bearer <token>."
+  title: Technical Reports API — Scontrol Ingeniería
+  version: 1.0.0
+servers:
+- description: Local
+  url: http://localhost:8080
+security:
+- bearerAuth: []
+tags:
+- description: Equipos de cada cliente
+  name: Equipment
+- description: Clientes de la empresa
+  name: Clients
+- description: Autenticación con JWT
+  name: Auth
+- description: "Opciones configurables (acción, estado, evento/falla, personal, responsable)"
+  name: Catalogs
+- description: Informes técnicos de mantenimiento
+  name: Technical Reports
+paths:
+  /api/auth/login:
+    post:
+      description: Devuelve un JWT válido por 10 horas
+      operationId: login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/LoginResponse"
+          description: OK
+      security: []
+      summary: Iniciar sesión
+      tags:
+      - Auth
+  /api/catalogs:
+    get:
+      description: Incluye activas e inactivas
+      operationId: findByType
+      parameters:
+      - in: query
+        name: type
+        required: true
+        schema:
+          type: string
+          enum:
+          - ACTION
+          - STATUS
+          - EVENT_FAILURE
+          - PERSONNEL
+          - SUPERVISOR
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CatalogResponse"
+          description: OK
+      summary: Listar opciones por tipo
+      tags:
+      - Catalogs
+    post:
+      operationId: create_3
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CatalogCreateRequest"
+        required: true
+      responses:
+        "201":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/CatalogResponse"
+          description: Creado
+      summary: Crear una opción
+      tags:
+      - Catalogs
+  /api/catalogs/{id}:
+    put:
+      description: El tipo no se puede cambiar
+      operationId: update_3
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CatalogUpdateRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/CatalogResponse"
+          description: OK
+      summary: Editar o desactivar una opción
+      tags:
+      - Catalogs
+  /api/clients:
+    get:
+      description: Ordenados por nombre
+      operationId: findAll_1
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ClientResponse"
+          description: OK
+      summary: Listar clientes
+      tags:
+      - Clients
+    post:
+      operationId: create_1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ClientRequest"
+        required: true
+      responses:
+        "201":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ClientResponse"
+          description: Creado
+      summary: Crear un cliente
+      tags:
+      - Clients
+  /api/clients/{clientId}/equipment:
+    get:
+      operationId: findByClient
+      parameters:
+      - in: path
+        name: clientId
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/EquipmentResponse"
+          description: OK
+      summary: Listar los equipos de un cliente
+      tags:
+      - Equipment
+    post:
+      operationId: create_2
+      parameters:
+      - in: path
+        name: clientId
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EquipmentRequest"
+        required: true
+      responses:
+        "201":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/EquipmentResponse"
+          description: Creado
+      summary: Crear un equipo para un cliente
+      tags:
+      - Equipment
+  /api/clients/{id}:
+    delete:
+      description: 409 si el cliente tiene equipos
+      operationId: delete_1
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "204":
+          description: Eliminado
+      summary: Eliminar un cliente
+      tags:
+      - Clients
+    get:
+      operationId: findById_2
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ClientResponse"
+          description: OK
+      summary: Obtener un cliente
+      tags:
+      - Clients
+    put:
+      operationId: update_2
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ClientRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ClientResponse"
+          description: OK
+      summary: Editar un cliente
+      tags:
+      - Clients
+  /api/equipment/{id}:
+    delete:
+      description: 409 si el equipo tiene informes
+      operationId: delete
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "204":
+          description: Eliminado
+      summary: Eliminar un equipo
+      tags:
+      - Equipment
+    get:
+      operationId: findById_1
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/EquipmentResponse"
+          description: OK
+      summary: Obtener un equipo
+      tags:
+      - Equipment
+    put:
+      operationId: update_1
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EquipmentRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/EquipmentResponse"
+          description: OK
+      summary: Editar un equipo
+      tags:
+      - Equipment
+  /api/technical-reports:
+    get:
+      description: Más recientes primero; filtros opcionales
+      operationId: findAll
+      parameters:
+      - in: query
+        name: clientId
+        required: false
+        schema:
+          type: integer
+          format: int64
+      - in: query
+        name: equipmentId
+        required: false
+        schema:
+          type: integer
+          format: int64
+      - in: query
+        name: from
+        required: false
+        schema:
+          type: string
+          format: date
+      - in: query
+        name: to
+        required: false
+        schema:
+          type: string
+          format: date
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TechnicalReportResponse"
+          description: OK
+      summary: Listar informes
+      tags:
+      - Technical Reports
+    post:
+      description: Asigna el número correlativo automáticamente
+      operationId: create
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TechnicalReportRequest"
+        required: true
+      responses:
+        "201":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/TechnicalReportResponse"
+          description: Creado
+      summary: Crear un informe
+      tags:
+      - Technical Reports
+  /api/technical-reports/{id}:
+    get:
+      operationId: findById
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/TechnicalReportResponse"
+          description: OK
+      summary: Obtener un informe
+      tags:
+      - Technical Reports
+    put:
+      description: No cambian el número ni el autor
+      operationId: update
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TechnicalReportRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/TechnicalReportResponse"
+          description: OK
+      summary: Editar un informe
+      tags:
+      - Technical Reports
+  /api/technical-reports/{id}/document:
+    get:
+      operationId: download
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: byte
+          description: OK
+      summary: Descargar el informe en PDF
+      tags:
+      - Technical Reports
+components:
+  schemas:
+    CatalogCreateRequest:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+          - ACTION
+          - STATUS
+          - EVENT_FAILURE
+          - PERSONNEL
+          - SUPERVISOR
+        value:
+          type: string
+          maxLength: 150
+          minLength: 0
+      required:
+      - type
+      - value
+    CatalogResponse:
+      type: object
+      properties:
+        active:
+          type: boolean
+        id:
+          type: integer
+          format: int64
+        type:
+          type: string
+          enum:
+          - ACTION
+          - STATUS
+          - EVENT_FAILURE
+          - PERSONNEL
+          - SUPERVISOR
+        value:
+          type: string
+    CatalogUpdateRequest:
+      type: object
+      properties:
+        active:
+          type: boolean
+        value:
+          type: string
+          maxLength: 150
+          minLength: 0
+      required:
+      - active
+      - value
+    ClientRequest:
+      type: object
+      properties:
+        contactEmail:
+          type: string
+          format: email
+          maxLength: 254
+          minLength: 0
+        documentNumber:
+          type: string
+          maxLength: 11
+          minLength: 0
+        documentType:
+          type: string
+          enum:
+          - RUC
+          - DNI
+        name:
+          type: string
+          maxLength: 200
+          minLength: 0
+      required:
+      - name
+    ClientResponse:
+      type: object
+      properties:
+        contactEmail:
+          type: string
+        documentNumber:
+          type: string
+        documentType:
+          type: string
+          enum:
+          - RUC
+          - DNI
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+    EquipmentRequest:
+      type: object
+      properties:
+        model:
+          type: string
+          maxLength: 100
+          minLength: 0
+        serialNumber:
+          type: string
+          maxLength: 255
+          minLength: 0
+      required:
+      - model
+    EquipmentResponse:
+      type: object
+      properties:
+        clientId:
+          type: integer
+          format: int64
+        clientName:
+          type: string
+        id:
+          type: integer
+          format: int64
+        model:
+          type: string
+        serialNumber:
+          type: string
+    LoginRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          maxLength: 254
+          minLength: 0
+        password:
+          type: string
+          maxLength: 72
+          minLength: 0
+      required:
+      - email
+      - password
+    LoginResponse:
+      type: object
+      properties:
+        accessToken:
+          type: string
+        expiresIn:
+          type: integer
+          format: int64
+        tokenType:
+          type: string
+    TechnicalReportRequest:
+      type: object
+      properties:
+        actionId:
+          type: integer
+          format: int64
+        affectedComponent:
+          type: string
+          maxLength: 255
+          minLength: 0
+        details:
+          type: string
+          minLength: 1
+        endDatetime:
+          type: string
+          format: date-time
+        equipmentId:
+          type: integer
+          format: int64
+        eventFailureId:
+          type: integer
+          format: int64
+        finalStatusId:
+          type: integer
+          format: int64
+        initialStatusId:
+          type: integer
+          format: int64
+        personnelId:
+          type: integer
+          format: int64
+        startDatetime:
+          type: string
+          format: date-time
+        supervisorId:
+          type: integer
+          format: int64
+      required:
+      - actionId
+      - details
+      - endDatetime
+      - equipmentId
+      - eventFailureId
+      - finalStatusId
+      - initialStatusId
+      - personnelId
+      - supervisorId
+    TechnicalReportResponse:
+      type: object
+      properties:
+        action:
+          $ref: "#/components/schemas/CatalogResponse"
+        affectedComponent:
+          type: string
+        clientId:
+          type: integer
+          format: int64
+        clientName:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        createdBy:
+          type: string
+        details:
+          type: string
+        endDatetime:
+          type: string
+          format: date-time
+        equipmentId:
+          type: integer
+          format: int64
+        equipmentModel:
+          type: string
+        equipmentSerialNumber:
+          type: string
+        eventFailure:
+          $ref: "#/components/schemas/CatalogResponse"
+        finalStatus:
+          $ref: "#/components/schemas/CatalogResponse"
+        id:
+          type: integer
+          format: int64
+        initialStatus:
+          $ref: "#/components/schemas/CatalogResponse"
+        personnel:
+          $ref: "#/components/schemas/CatalogResponse"
+        reportNumber:
+          type: string
+        startDatetime:
+          type: string
+          format: date-time
+        supervisor:
+          $ref: "#/components/schemas/CatalogResponse"
+  securitySchemes:
+    bearerAuth:
+      bearerFormat: JWT
+      scheme: bearer
+      type: http

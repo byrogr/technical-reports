@@ -2,6 +2,7 @@ package com.scontrol.technicalreports.dto;
 
 import com.scontrol.technicalreports.model.DocumentType;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -19,6 +20,8 @@ public record ClientRequest(
         @Email @Size(max = 254) String contactEmail) {
 
     // Tipo y número van juntos; el número debe tener 11 dígitos si es RUC y 8 si es DNI
+    // Solo validación: no es un campo del JSON
+    @Schema(hidden = true)
     @AssertTrue(message = "documentType y documentNumber van juntos: RUC de 11 dígitos o DNI de 8 dígitos")
     public boolean isDocumentValid() {
         if (documentType == null || documentNumber == null) {

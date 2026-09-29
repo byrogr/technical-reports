@@ -21,6 +21,11 @@ import com.scontrol.technicalreports.dto.TechnicalReportRequest;
 import com.scontrol.technicalreports.dto.TechnicalReportResponse;
 import com.scontrol.technicalreports.service.TechnicalReportService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -30,12 +35,14 @@ import lombok.RequiredArgsConstructor;
  * @author Roger Rojas Effio - roger.rojas@rmsolutions.pe
  */
 @RestController
+@Tag(name = "Technical Reports", description = "Informes técnicos de mantenimiento")
 @RequestMapping("/api/technical-reports")
 @RequiredArgsConstructor
 public class TechnicalReportController {
 
     private final TechnicalReportService technicalReportService;
 
+    @Operation(summary = "Listar informes", description = "Más recientes primero; filtros opcionales")
     @GetMapping
     public List<TechnicalReportResponse> findAll(
             @RequestParam(required = false) Long clientId,
@@ -45,19 +52,23 @@ public class TechnicalReportController {
         return technicalReportService.findAll(clientId, equipmentId, from, to);
     }
 
+    @Operation(summary = "Obtener un informe")
     @GetMapping("/{id}")
     public TechnicalReportResponse findById(@PathVariable Long id) {
         return technicalReportService.findById(id);
     }
 
+    @Operation(summary = "Crear un informe", description = "Asigna el número correlativo automáticamente")
+    @ApiResponse(responseCode = "201", description = "Creado")
     @PostMapping
     public ResponseEntity<TechnicalReportResponse> create(@Valid @RequestBody TechnicalReportRequest request,
-                                                          @AuthenticationPrincipal Jwt jwt) {
+                                                          @Parameter(hidden = true) @AuthenticationPrincipal Jwt jwt) {
         // El subject del JWT es el email del usuario autenticado
         TechnicalReportResponse created = technicalReportService.create(request, jwt.getSubject());
         return ResponseEntity.created(URI.create("/api/technical-reports/" + created.id())).body(created);
     }
 
+    @Operation(summary = "Editar un informe", description = "No cambian el número ni el autor")
     @PutMapping("/{id}")
     public TechnicalReportResponse update(@PathVariable Long id, @Valid @RequestBody TechnicalReportRequest request) {
         return technicalReportService.update(id, request);

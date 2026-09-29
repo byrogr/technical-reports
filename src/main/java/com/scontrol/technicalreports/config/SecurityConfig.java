@@ -42,6 +42,9 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
                         // Necesario para que los errores de endpoints públicos no se conviertan en 401
                         .requestMatchers("/error").permitAll()
+                        // Documentación OpenAPI y Swagger UI (solo describen la API, no dan acceso a datos)
+                        .requestMatchers("/v3/api-docs*", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html")
+                        .permitAll()
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()));
         return http.build();
