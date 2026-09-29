@@ -1,0 +1,7 @@
+# Valores solo para tests; el datasource lo aporta Testcontainers (@ServiceConnection)
+app:
+  jwt:
+    secret: test-secret-with-at-least-32-bytes-long
+  admin:
+    email: admin@scontrol.test
+    password: admin-test-password
