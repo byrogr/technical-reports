@@ -1,0 +1,26 @@
+spring:
+  application:
+    name: technical-reports
+
+  # Base de datos (valores por defecto para el PostgreSQL local de compose.yaml)
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/technical_reports}
+    username: ${DB_USERNAME:technical_reports}
+    password: ${DB_PASSWORD:technical_reports}
+
+  # El esquema lo gestiona Flyway; Hibernate solo valida que las entidades coincidan
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+
+app:
+  # JWT: la clave (mínimo 32 caracteres para HS256) llega siempre por variable de entorno
+  jwt:
+    secret: ${JWT_SECRET}
+    expiration: 10h
+
+  # Usuario inicial: se crea al arrancar solo si la tabla users está vacía
+  admin:
+    email: ${ADMIN_EMAIL:}
+    password: ${ADMIN_PASSWORD:}
