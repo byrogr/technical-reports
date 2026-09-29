@@ -53,3 +53,8 @@ Requiere Docker activo: los tests levantan un PostgreSQL real con Testcontainers
 
 - [`DESIGN.md`](DESIGN.md): modelo de datos, endpoints, reglas de negocio y fases de desarrollo.
 - [`CLAUDE.md`](CLAUDE.md): convenciones de código y de trabajo en el proyecto.
+- [`docs/API.md`](docs/API.md): referencia de la API REST (endpoints, campos, errores, flujo).
+- [`docs/openapi.yaml`](docs/openapi.yaml): especificación OpenAPI 3.1. Con la app en marcha,
+  Swagger UI en `http://localhost:8080/swagger-ui.html`.
+- [`docs/AZURE_DEPLOYMENT.md`](docs/AZURE_DEPLOYMENT.md): arquitectura de despliegue en Azure.
+- [`docs/LOCAL_INSTALL.md`](docs/LOCAL_INSTALL.md): instalación en el PC de un operario.

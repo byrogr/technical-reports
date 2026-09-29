@@ -106,7 +106,14 @@ docker compose up -d        # PostgreSQL local (compose.yaml)
 JWT_SECRET=<mín. 32 caracteres> ADMIN_EMAIL=<email> ADMIN_PASSWORD=<clave> \
   ./mvnw spring-boot:run     # levantar la app localmente
 ./mvnw test                 # correr tests (requiere Docker activo por Testcontainers)
+./mvnw test -Dtest=OpenApiDocumentationTests -Dopenapi.export=true   # regenerar docs/openapi.yaml
+docker compose -f compose.local.yaml up -d --build   # stack completo (API + BD), ver docs/LOCAL_INSTALL.md
 ```
+
+**Documentación de la API:** al cambiar un endpoint o un DTO, regenerar `docs/openapi.yaml`
+(el test `OpenApiDocumentationTests` falla si queda desactualizado), actualizar
+`docs/API.md`, y anotar los endpoints nuevos con `@Operation` (y `@ApiResponse` si no
+responden 200).
 
 `JWT_SECRET` es obligatoria (sin ella la app no arranca). `ADMIN_EMAIL` / `ADMIN_PASSWORD`
 solo se usan la primera vez, cuando la tabla `users` está vacía. Para empezar de cero:
