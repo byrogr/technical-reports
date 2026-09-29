@@ -18,7 +18,7 @@ en esta misma raíz — léelo también antes de implementar cualquier fase.
 - Flyway (migraciones)
 - Maven
 - Lombok (reducir boilerplate) y MapStruct (mapeo Entity <-> DTO)
-- Apache POI (Word) / OpenPDF (PDF) para generación de documentos — **no usar iText** (licencia AGPL)
+- OpenPDF para generar el informe en PDF (solo PDF, sin Word) — **no usar iText** (licencia AGPL)
 - Testcontainers (PostgreSQL) para tests de integración — no usar H2
 
 ## Convenciones de código (obligatorias)

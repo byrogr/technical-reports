@@ -2,7 +2,7 @@
 
 API REST para registrar los informes técnicos de mantenimiento de equipos (radiocontrol,
 video, anticolisión, pesaje, antifatiga y seguridad para puentes grúa) y generar el
-documento final en PDF/Word. Reemplaza el llenado manual en Excel.
+documento final en PDF. Reemplaza el llenado manual en Excel.
 
 ## Stack
 
@@ -10,6 +10,7 @@ documento final en PDF/Word. Reemplaza el llenado manual en Excel.
 - Spring Security + JWT (OAuth2 Resource Server)
 - Spring Data JPA, PostgreSQL, Flyway
 - Lombok y MapStruct
+- OpenPDF (generación del informe en PDF)
 - Tests de integración con Testcontainers
 
 ## Requisitos

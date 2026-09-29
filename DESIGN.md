@@ -5,7 +5,7 @@
 Reemplazar el llenado manual en Excel de "Informes Técnicos" de mantenimiento de equipos
 (radiocontrol, video, anticolisión, pesaje, antifatiga, seguridad para puentes grúa) por
 una API que permita registrar informes, mantener catálogos configurables, y generar el
-documento final (PDF/Word) con el mismo formato que usa la empresa hoy.
+documento final en PDF con el mismo formato que usa la empresa hoy.
 
 **Usuarios:** 1-2 personas (uso interno, sin necesidad de roles granulares).
 **Escala:** baja (decenas/cientos de informes, no miles por día).
@@ -20,7 +20,7 @@ microservicios ni monolito modular — no se justifica a esta escala.
 - CRUD de Equipos (asociados a un cliente)
 - Catálogos configurables (Acción, Estado, Evento/Falla, Personal, Responsable)
 - CRUD de Informes Técnicos con numeración correlativa automática
-- Generación del informe en PDF/Word con el formato original
+- Generación del informe en PDF con el formato original
 
 ### Fuera de alcance (agregar después, solo si se necesita)
 - Adjuntos / evidencia fotográfica
@@ -38,7 +38,7 @@ microservicios ni monolito modular — no se justifica a esta escala.
 | Seguridad | Spring Security + JWT con `spring-boot-starter-security-oauth2-resource-server` (Nimbus JOSE) |
 | Persistencia | Spring Data JPA |
 | Base de datos | PostgreSQL |
-| Generación de documentos | Apache POI (Word) y/o OpenPDF (PDF) — iText descartado por licencia AGPL |
+| Generación de documentos | OpenPDF (solo PDF) — iText descartado por licencia AGPL |
 | Build | Maven |
 | Boilerplate / mapeo | Lombok y MapStruct |
 | Migraciones de BD | Flyway (recomendado desde el inicio, evita dolores de cabeza después) |
@@ -56,7 +56,7 @@ com.scontrol.technicalreports
 ├── dto/              # Request/Response DTOs
 ├── mapper/            # Entity <-> DTO con MapStruct
 ├── exception/         # Manejo centralizado de errores
-└── document/          # Generación de PDF/Word (Apache POI / OpenPDF)
+└── document/          # Generación del PDF (OpenPDF)
 ```
 
 ## 5. Modelo de datos
@@ -256,13 +256,22 @@ en la migración `V2__seed_catalogs.sql`.*
 ### Technical Reports
 | Método | Ruta | Descripción |
 |---|---|---|
-| GET | `/api/technical-reports` | Listar (filtros: `clientId` vía el equipo, `equipmentId`, rango de fechas) |
+| GET | `/api/technical-reports` | Listar, más recientes primero. Filtros opcionales: `clientId` (vía el equipo), `equipmentId`, `from` y `to` (fechas ISO `yyyy-MM-dd`, inclusivas, sobre `end_datetime`) |
 | GET | `/api/technical-reports/{id}` | Detalle |
 | POST | `/api/technical-reports` | Crear (genera número correlativo automáticamente) |
 | PUT | `/api/technical-reports/{id}` | Editar |
-| GET | `/api/technical-reports/{id}/document` | Descarga el PDF/Word generado |
+| GET | `/api/technical-reports/{id}/document` | Descarga el PDF (`informe-tecnico-<número>.pdf`) |
+
+*No hay DELETE: los informes emitidos se conservan. Al editar no cambian el número ni el
+autor (`created_by`, tomado del email del JWT al crear). La respuesta incluye cliente, equipo
+y catálogos ya resueltos.*
 
 ## 7. Lógica de negocio clave
+
+**Validación de catálogos en informes:** cada campo que apunta a `catalogs` debe
+referenciar una opción existente, del tipo correcto (ej. `initial_status_id` → `STATUS`) y
+activa. Al editar se acepta una opción desactivada solo si es la que el informe ya tenía.
+Un equipo o una opción inexistente/inválida en el body responde `400`.
 
 **Borrado con dependencias:** no se permite eliminar un cliente que tenga equipos ni un
 equipo que tenga informes; la API responde `409 Conflict`. No hay borrado en cascada ni
@@ -286,13 +295,18 @@ formato `<serie>-<correlativo>`, ej. `008-0001`.
 - **Formato:** correlativo con relleno mínimo de 4 dígitos. Al superar 9999 sigue
   creciendo sin error (`008-9999` → `008-10000`).
 - **Integridad:** `report_number` tiene restricción `UNIQUE` como red de seguridad.
+- **Orden de operaciones:** primero se valida la petición (equipo y catálogos) y al final se
+  bloquea e incrementa el contador, para que una petición inválida no consuma número y el
+  bloqueo dure lo mínimo.
 
-**Generación de documento:** al llamar `/api/technical-reports/{id}/document`, el servicio debe
-tomar los datos del informe (cliente, equipo, catálogos resueltos, detalle) y rellenar
-una plantilla Word/PDF con el mismo layout que la plantilla Excel original (cabecera
-"INFORME TÉCNICO" con N°, datos del equipo: cliente, modelo y N/S, fechas, estado al
-inicio y al término, evento/falla con el componente afectado, acción, detalle, firmas de
-técnico y responsable).
+**Generación de documento:** al llamar `/api/technical-reports/{id}/document` se genera
+al vuelo (no se guarda) un PDF A4 con OpenPDF que reproduce el layout de la plantilla Excel
+original: panel azul con etiquetas en negrita y datos en cajas blancas; cabecera con el logo
+de Scontrol (`src/main/resources/document/scontrol-logo.png`, extraído del Excel),
+"INFORME TÉCNICO" y N°; detalle de equipo (cliente, modelo, N/S, fechas de inicio y término,
+estado al inicio y al término); evento/falla con el componente afectado; acción; detalle; y
+firmas con solo el nombre del técnico y del responsable. Si el detalle es largo, el PDF
+continúa en páginas siguientes. Word no está en alcance.
 
 ## 8. Seguridad
 
@@ -337,7 +351,7 @@ técnico y responsable).
 
 **Fase 3 — Núcleo del sistema**
 7. CRUD Informes + lógica de numeración correlativa
-8. Generación de documento (PDF/Word)
+8. Generación de documento (PDF)
 
 **Fase 4 — Opcional (solo si se pide)**
 9. Adjuntos/evidencia fotográfica
