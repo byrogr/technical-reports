@@ -1,0 +1,21 @@
+-- Opciones iniciales de catálogo, tomadas de la Hoja2 del Excel original
+INSERT INTO catalogs (type, value) VALUES
+    ('ACTION', 'Mantenimiento Preventivo'),
+    ('ACTION', 'Mantenimiento Correctivo'),
+    ('ACTION', 'Instalación'),
+    ('ACTION', 'Supervisión'),
+    ('ACTION', 'Otros'),
+    ('STATUS', 'Operativo'),
+    ('STATUS', 'Inoperativo'),
+    ('STATUS', 'En Obs.'),
+    ('EVENT_FAILURE', 'Sistema Radiocontrol'),
+    ('EVENT_FAILURE', 'Sistema de video'),
+    ('EVENT_FAILURE', 'Sistema anticolisión movil'),
+    ('EVENT_FAILURE', 'Sistema de pesaje'),
+    ('EVENT_FAILURE', 'Sistema antifatiga'),
+    ('EVENT_FAILURE', 'Sistema de seguridad para puentes grua'),
+    ('PERSONNEL', 'Tec. Jorge Antonio Huaman Andia'),
+    ('PERSONNEL', 'Ing. Javier Elias Marigorda Castro'),
+    ('PERSONNEL', 'Ing. Julio Martín Alban León.'),
+    ('SUPERVISOR', 'Ing. Julio Martín Alban León.'),
+    ('SUPERVISOR', 'Ing. Edson Mejia Cielo.');
